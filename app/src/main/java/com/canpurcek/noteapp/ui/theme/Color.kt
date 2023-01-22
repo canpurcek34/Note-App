@@ -34,5 +34,9 @@ val Brown     = Color(0xffe6c9a8)
 val Gray      = Color(0xffe8eaed)
 val DarkGray  = Color(0xFF2C2C2C)
 
+//LightThemeColors
+val LightHomeBack       = Color(0xFFFFFFFF)
 
+//DarkThemeColors
+val DarkHomeBack       = Color(0xff202124)
 

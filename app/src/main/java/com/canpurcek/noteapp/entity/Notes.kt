@@ -5,26 +5,24 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
+import com.canpurcek.noteapp.ui.theme.*
 
 
 @Parcalize
 @Entity(tableName = "NOTES")
 data class Notes(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo("note_id") @NotNull var note_id:Int,
-    @ColumnInfo("note_title") @NotNull var note_title: String,
-    @ColumnInfo("note_desc") @NotNull var note_desc: String,
-    @ColumnInfo("note_date") @Nullable var note_date: String?
+    @ColumnInfo("note_id") var note_id:Int,
+    @ColumnInfo("note_title") var note_title: String,
+    @ColumnInfo("note_desc") var note_desc: String,
+    @ColumnInfo("note_date") var note_date: String,
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString().toString(),
         parcel.readString().toString(),
-        parcel.readString()
-    ) {
-    }
+        parcel.readString().toString(),
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(note_id)
@@ -42,10 +40,26 @@ data class Notes(
             return Notes(parcel)
         }
 
-        override fun newArray(size: Int): Array<Notes?> {
+        val noteColors = listOf(
+            Red,
+            Orange,
+            Yellow,
+            Green,
+            Turquoise,
+            Blue,
+            DarkBlue,
+            Purple,
+            Pink,
+            Brown,
+            Gray,
+            DarkGray)
+
+                    override fun newArray(size: Int): Array<Notes?> {
             return arrayOfNulls(size)
         }
     }
+
+
 }
 
 annotation class Parcalize

@@ -2,33 +2,29 @@ package com.canpurcek.noteapp
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,36 +32,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.canpurcek.noteapp.entity.Notes
 import com.canpurcek.noteapp.ui.theme.Chakra
+import com.canpurcek.noteapp.ui.theme.DarkHomeBack
+import com.canpurcek.noteapp.ui.theme.LightHomeBack
+import com.canpurcek.noteapp.ui.theme.OpenSans
 import com.canpurcek.noteapp.viewmodel.NoteDetailScreenViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-@OptIn(ExperimentalMaterialApi::class)
+
+
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat")
 @Composable
 fun NoteDetailScreen(getNote: Notes, navController: NavController) {
 
     val tFNoteTitle = remember { mutableStateOf("") }
     val tFNote = remember { mutableStateOf("") }
-
-    val colors = listOf<Color>(
-        Color(0xfff28b82),
-        Color(0xfffbbc04),
-        Color(0xfffff475),
-        Color(0xffccff90),
-        Color(0xffa7ffeb),
-        Color(0xffcbf0f8),
-        Color(0xffaecbfa),
-        Color(0xffd7aebf),
-        Color(0xfffdcfe8),
-        Color(0xffe6c9a8),
-        Color(0xffe8eaed),
-        Color(0xFF2C2C2C)
-    )
-
-    var currentlySelected by rememberSaveable(saver = colourSaver()) { mutableStateOf(colors[1]) }
 
     LaunchedEffect(key1 = true) {
         tFNoteTitle.value = getNote.note_title.toString()
@@ -85,10 +70,12 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
         sheetState = bottomState,
         content={
         Scaffold(
+            backgroundColor = MaterialTheme.colors.onPrimary,
             topBar = {
                 TopAppBar(
                     modifier = Modifier.fillMaxWidth(),
-                    backgroundColor = currentlySelected
+                    elevation = 0.dp,
+                    backgroundColor = MaterialTheme.colors.onPrimary
                 ) {
                     IconButton(
                         onClick = {
@@ -99,16 +86,18 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
 
                         Icon(
                             painter = painterResource(id = R.drawable.back),
-                            contentDescription = ""
+                            contentDescription = "",tint = MaterialTheme.colors.onSurface
                         )
                     }
+                    lightColors(onSurface = LightHomeBack)
+                    darkColors(onSurface = DarkHomeBack)
                 }
             },
             content = {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(currentlySelected)
+                        .background(Color.Transparent)
                         .padding(bottom = 35.dp)
                 ) {
                     val lightBlue = Color(0xffd8e6ff)
@@ -116,20 +105,20 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = tFNoteTitle.value,
-                        label = { Text(text = "Başlık") },
+                        label = { Text(text = "Başlık",style = TextStyle(MaterialTheme.colors.onSurface)) },
                         textStyle = TextStyle(
-                            color = Color.Black,
-                            fontSize = 18.sp,
-                            fontFamily = Chakra,
-                            fontWeight = FontWeight.Medium
+                            fontSize = 16.sp,
+                            fontFamily = OpenSans,
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.W500
                         ),
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
-                            cursorColor = Color.Black,
+                            cursorColor = MaterialTheme.colors.onSurface,
                             disabledLabelColor = lightBlue,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            textColor = Color.Black
+                            textColor = MaterialTheme.colors.onSurface
                         ),
                         onValueChange = {
 
@@ -159,20 +148,20 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     TextField(
                         modifier = Modifier.padding(bottom = 10.dp),
                         value = tFNote.value,
-                        label = { Text(text = "Not") },
+                        label = { Text(text = "Not",style = TextStyle(MaterialTheme.colors.onSurface)) },
                         textStyle = TextStyle(
-                            color = Color.DarkGray,
                             fontSize = 14.sp,
-                            fontFamily = Chakra,
-                            fontWeight = FontWeight.Normal
+                            fontFamily = OpenSans,
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.W400
                         ),
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
-                            cursorColor = Color.Black,
+                            cursorColor = MaterialTheme.colors.onSurface,
                             disabledLabelColor = lightBlue,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            textColor = Color.Black
+                            textColor = MaterialTheme.colors.onSurface
                         ),
                         onValueChange = {
                             tFNote.value = it
@@ -203,40 +192,47 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    containerColor = BottomAppBarDefaults.containerColor,
+                    containerColor = MaterialTheme.colors.onPrimary,
                     content = {
+                        darkColors(onSurface = LightHomeBack)
+                        lightColors(onSurface = DarkHomeBack)
+
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.multi_add),
-                                contentDescription = "multi add", tint = Color.Black
+                                contentDescription = "multi add", tint = MaterialTheme.colors.onSurface
                             )
                         }
                         IconButton(onClick = {
 
-                          sheetShift = true
+                            sheetShift = true
+
+                            scope.launch { bottomState.show() }
 
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.palette),
-                                contentDescription = "note color palette", tint = Color.Black
+                                contentDescription = "note color palette", tint = MaterialTheme.colors.onSurface
                             )
                         }
 
                         val date = getNote.note_date
 
-                        Text(text = "Düzenlenme zamanı:${date.toString()}")
+                        Text(text = "Düzenlenme ${date.toString()}",
+                            style = TextStyle(MaterialTheme.colors.onSurface))
 
 
-                        IconButton(onClick = {
-
-                            scope.launch { bottomState.show() }
+                        IconButton(modifier = Modifier.padding(end = 5.dp),
+                            onClick = {
 
                             sheetShift = false
+
+                            scope.launch { bottomState.show() }
 
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.menu),
-                                contentDescription = "options menu", tint = Color.Black
+                                contentDescription = "options menu", tint = MaterialTheme.colors.onSurface
                             )
                         }
                     }
@@ -246,29 +242,45 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
     },
         sheetContent = {
 
-            if (!sheetShift) {
+            if (sheetShift) {
 
-                Column(modifier = Modifier.fillMaxWidth()) {
+
+
+            } else {
+
+                Column(modifier = Modifier
+                    .padding(start = 10.dp, end = 10.dp)
+                    .fillMaxWidth()
+                    .height(200.dp),
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+
+                    darkColors(onSurface = LightHomeBack)
+                    lightColors(onSurface = DarkHomeBack)
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable{
+                                val id = getNote.note_id
+
+                                viewModel.noteDelete(id)
+
+                                navController.navigate("main_page")
+                        },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {
-
-                            val id = getNote.note_id
-
-                            viewModel.noteDelete(id)
-
-                            navController.navigate("main_page")
-
-                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.delete),
                                 contentDescription = "delete"
                             )
-                        }
-                        Text(text = "Sil")
+
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(text = "Sil",style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
@@ -277,18 +289,24 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable{
+
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {
 
-                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.copy),
                                 contentDescription = "copy"
                             )
-                        }
-                        Text(text = "Kopya oluştur")
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(text = "Kopya oluştur",style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
@@ -297,18 +315,24 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable{
+
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {
 
-                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.share),
                                 contentDescription = "share"
                             )
-                        }
-                        Text(text = "Gönder")
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(text = "Gönder",style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
@@ -317,18 +341,24 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {
 
-                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.add_alt),
                                 contentDescription = "add_alt"
                             )
-                        }
-                        Text(text = "Ortak çalışan")
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(text = "Ortak çalışan",style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
@@ -337,18 +367,24 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = {
 
-                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.label),
                                 contentDescription = "labels"
                             )
-                        }
-                        Text(text = "Etiketler")
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(text = "Etiketler",style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
@@ -356,12 +392,8 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                             .height(5.dp)
                     )
                 }
-            }else{
-
-
             }
-        }
-    )
+        })
 
     val backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
@@ -370,21 +402,8 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
     }
 }
 
-fun colourSaver() = Saver<MutableState<Color>, String>(
-    save = { state -> state.value.toHexString() },
-    restore = { value -> mutableStateOf(value.toColor()) }
-)
 
-fun Color.toHexString(): String {
-    return String.format(
-        "#%02x%02x%02x%02x", (this.alpha * 255).toInt(),
-        (this.red * 255).toInt(), (this.green * 255).toInt(), (this.blue * 255).toInt()
-    )
-}
 
-fun String.toColor(): Color {
-    return Color(android.graphics.Color.parseColor(this))
-}
 
 
 

@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.canpurcek.noteapp.entity.Notes
 
-@Database(entities = [Notes::class], version = 1)
+@Database(entities = [Notes::class], version = 2)
 abstract class dataBase : RoomDatabase(){
 
     abstract fun notesDao(): notesDaoRoom

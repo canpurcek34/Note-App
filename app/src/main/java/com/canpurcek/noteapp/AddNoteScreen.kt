@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +23,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.canpurcek.noteapp.entity.Notes
 import com.canpurcek.noteapp.ui.theme.Chakra
+import com.canpurcek.noteapp.ui.theme.DarkHomeBack
+import com.canpurcek.noteapp.ui.theme.LightHomeBack
 import com.canpurcek.noteapp.viewmodel.AddNoteScreenViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat")
 @Composable
 fun AddNoteScreen(NavController: NavHostController) {
 
@@ -41,17 +44,18 @@ fun AddNoteScreen(NavController: NavHostController) {
 
 
     Scaffold(
+        backgroundColor = MaterialTheme.colors.onPrimary,
         topBar = {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = Color.White
+                backgroundColor = MaterialTheme.colors.onPrimary
             ) {
                 IconButton(
 
                     onClick = {
 
-                        val title = tFNoteTitle.value.toString()
-                        val desc = tFNote.value.toString()
+                        val title = tFNoteTitle.value
+                        val desc = tFNote.value
                         val sdf = SimpleDateFormat("EEE:HH:mm")
                         val date = sdf.format(Date())
 
@@ -62,18 +66,18 @@ fun AddNoteScreen(NavController: NavHostController) {
                         } else {
                             viewModel.noteAdd(title, desc, date)
 
-                            Log.e("KAYIT","${title}-${desc}")
+                            Log.e("KAYIT", "${title}-${desc}")
                         }
 
 
 
-                        navController.navigate("main_page")
+                        NavController.navigate("main_page")
 
                     }) {
 
                     Icon(
                         painter = painterResource(id = R.drawable.back),
-                        contentDescription = ""
+                        contentDescription = "",tint = MaterialTheme.colors.onSurface
                     )
                 }
 
@@ -81,15 +85,17 @@ fun AddNoteScreen(NavController: NavHostController) {
 
         },
         content = {
-            Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+            lightColors(onSurface = MaterialTheme.colors.onPrimary)
+            darkColors(onSurface = MaterialTheme.colors.onPrimary)
+
+            Column(modifier = Modifier.fillMaxSize()) {
                 val lightBlue = Color(0xffd8e6ff)
                 val blue = Color(0xff76a9ff)
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = tFNoteTitle.value,
-                    label = { Text(text = "Başlık") },
+                    label = { Text(text = "Başlık",style = TextStyle(MaterialTheme.colors.onSurface)) },
                     textStyle = TextStyle(
-                        color = Color.Black,
                         fontSize = 18.sp,
                         fontFamily = Chakra,
                         fontStyle = FontStyle.Normal,
@@ -97,11 +103,11 @@ fun AddNoteScreen(NavController: NavHostController) {
                     ),
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        cursorColor = Color.Black,
+                        cursorColor = MaterialTheme.colors.onSurface,
                         disabledLabelColor = lightBlue,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        textColor = Color.Black
+                        textColor = MaterialTheme.colors.onSurface
                     ),
                     onValueChange = {
 
@@ -114,9 +120,8 @@ fun AddNoteScreen(NavController: NavHostController) {
                 TextField(
                     modifier = Modifier,
                     value = tFNote.value,
-                    label = { Text(text = "Not") },
+                    label = { Text(text = "Not", style = TextStyle(MaterialTheme.colors.onSurface)) },
                     textStyle = TextStyle(
-                        color = Color.DarkGray,
                         fontSize = 14.sp,
                         fontFamily = Chakra,
                         fontStyle = FontStyle.Normal,
@@ -124,11 +129,11 @@ fun AddNoteScreen(NavController: NavHostController) {
                     ),
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        cursorColor = Color.Black,
+                        cursorColor = MaterialTheme.colors.onSurface,
                         disabledLabelColor = lightBlue,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        textColor = Color.Black
+                        textColor = MaterialTheme.colors.onSurface
                     ),
                     onValueChange = {
                         tFNote.value = it
@@ -145,30 +150,36 @@ fun AddNoteScreen(NavController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                backgroundColor = BottomAppBarDefaults.containerColor,
+                backgroundColor = MaterialTheme.colors.onPrimary,
                 content = {
+                    darkColors(onSurface = Color.LightGray)
+                    lightColors(onSurface = Color.White)
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.multi_add),
-                            contentDescription = "multi add"
+                            contentDescription = "multi add",tint = MaterialTheme.colors.onSurface
                         )
                     }
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.palette),
-                            contentDescription = "note color palette",
+                            contentDescription = "note color palette",tint = MaterialTheme.colors.onSurface
                         )
                     }
                     val sdf = SimpleDateFormat("EEE:HH:mm")
                     val date = sdf.format(Date())
 
-                    Text(text = "Düzenlenme zamanı:${date}")
+                    Text(modifier = Modifier,
+                        text = "Düzenlenme ${date}",
+                        style = TextStyle(MaterialTheme.colors.onSurface))
 
                 }
 
             )
         }
     )
+
+
 
     val backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
@@ -182,9 +193,9 @@ fun AddNoteScreen(NavController: NavHostController) {
 
             viewModel.noteAdd(title, desc, date)
 
-            Log.e("KAYIT","${title}-${desc}")
+            Log.e("KAYIT", "${title}-${desc}")
         }
-        navController.popBackStack()
+        NavController.popBackStack()
 
 
     }

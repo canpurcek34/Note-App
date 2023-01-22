@@ -28,8 +28,6 @@ class MainActivity : ComponentActivity() {
 
             Surface() {
                 NoteAppTheme {
-
-
                     PageTrans()
 
                 }

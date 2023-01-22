@@ -3,6 +3,7 @@ package com.canpurcek.noteapp
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.hardware.lights.Light
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.FabPosition
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -106,12 +108,16 @@ fun HomeScreen(navController: NavController){
     ) {
     Scaffold(
         modifier = Modifier.fillMaxWidth(),
-        backgroundColor = Color.White,
+        backgroundColor = MaterialTheme.colors.onPrimary,
             content ={
-
+                    lightColors(onSurface = LightHomeBack)
+                    darkColors(onSurface = DarkHomeBack)
                 Column(
-                    modifier = Modifier.background(color = Color.White),
+                    modifier = Modifier,
                     verticalArrangement = Arrangement.SpaceBetween) {
+
+                    lightColors(onSurface = LightHomeBack)
+                    darkColors(onSurface = DarkHomeBack)
 
                     Row(
                         modifier = Modifier
@@ -119,14 +125,20 @@ fun HomeScreen(navController: NavController){
                             .height(50.dp)
                             .padding(top = 10.dp)
                     ) {
+                        lightColors(onSurface = LightHomeBack)
+                        darkColors(onSurface = DarkHomeBack)
 
                         Card(
                             modifier = Modifier
                                 .padding(start = 10.dp, end = 10.dp)
                                 .height(50.dp),
                             shape = CircleShape,
-                            backgroundColor = SearchColor
+                            backgroundColor = MaterialTheme.colors.onPrimary
                         ) {
+                            lightColors(onSurface = LightHomeBack)
+                            darkColors(onSurface = DarkHomeBack)
+
+
 
                             Row(
                                 modifier = Modifier
@@ -135,16 +147,20 @@ fun HomeScreen(navController: NavController){
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 content ={
 
+                                    lightColors(onSurface = LightHomeBack)
+                                    darkColors(onSurface = DarkHomeBack)
+
                                     IconButton(modifier = Modifier.padding(start = 2.dp),
                                         onClick = { /*TODO*/ }) {
                                         Icon(painter = painterResource(id = R.drawable.menu_drawer),
-                                            contentDescription = "menu drawer")
+                                            contentDescription = "menu drawer",
+                                            tint = MaterialTheme.colors.onSurface)
                                     }
 
                                     Text(
                                         modifier = Modifier,
                                         text = "Notlarınızda arayın" ,
-                                        color = Color.DarkGray,
+                                        color = MaterialTheme.colors.onSurface,
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         fontFamily = Roboto,
@@ -162,12 +178,12 @@ fun HomeScreen(navController: NavController){
 
                                         if(checked){
                                             Icon(painter = painterResource(id = R.drawable.gridview),
-                                                contentDescription = "screen")
+                                                contentDescription = "screen",tint = MaterialTheme.colors.onSurface)
                                         }else {
 
                                             Icon(
                                                 painter = painterResource(id = R.drawable.splitscreen),
-                                                contentDescription = "screen"
+                                                contentDescription = "screen",tint = MaterialTheme.colors.onSurface
                                             )
                                         }
                                     }
@@ -175,7 +191,7 @@ fun HomeScreen(navController: NavController){
                                     IconButton(modifier = Modifier.padding(end = 2.dp),
                                         onClick = { /*TODO*/ }) {
                                         Icon(painter = painterResource(id = R.drawable.person),
-                                            contentDescription = "person")
+                                            contentDescription = "person",tint = MaterialTheme.colors.onSurface)
                                     }
                                 }
                             )
@@ -193,6 +209,9 @@ fun HomeScreen(navController: NavController){
 
                         content = {
 
+                            lightColors(onSurface = LightHomeBack)
+                            darkColors(onSurface = DarkHomeBack)
+
                             //change list view ui
                             if (!checked) {
 
@@ -203,15 +222,22 @@ fun HomeScreen(navController: NavController){
                                 userScrollEnabled = true,
                                 columns = StaggeredGridCells.Fixed(frameCount),
                                 content = {
+                                    lightColors(onSurface = LightHomeBack)
+                                    darkColors(onSurface = DarkHomeBack)
                                     items(itemCount) {
 
-                                        val choosedColor: Color = Brown
+                                        val choosedColor: Color = MaterialTheme.colors.onPrimary
+
+                                        //notecards
 
                                         Card(
                                             backgroundColor = choosedColor,
                                             modifier = Modifier
                                                 .padding(3.dp)
                                                 .sizeIn(maxHeight = 250.dp)
+                                                .border(1.dp, MaterialTheme.colors.onSurface,
+                                                    RoundedCornerShape(8.dp)
+                                                )
                                                 .combinedClickable(onClick = {
 
                                                     val note = allNotes.value!![it]
@@ -222,7 +248,6 @@ fun HomeScreen(navController: NavController){
 
                                                 }
                                                 ),
-                                            shape = RoundedCornerShape(12.dp),
                                             content = {
 
                                                 Column(
@@ -244,10 +269,10 @@ fun HomeScreen(navController: NavController){
                                                                 )
                                                                 .weight(1f)
                                                                 .wrapContentWidth(Alignment.Start),
-                                                            text = note.note_title.toString(),
+                                                            text = note.note_title,
                                                             overflow = TextOverflow.Ellipsis,
                                                             style = TextStyle(
-                                                                color = cont_normal,
+                                                                color = MaterialTheme.colors.onSurface,
                                                                 fontSize = 16.sp,
                                                                 fontFamily = OpenSans,
                                                                 fontStyle = FontStyle.Normal,
@@ -271,9 +296,9 @@ fun HomeScreen(navController: NavController){
                                                             )
                                                             .wrapContentWidth(Alignment.Start),
                                                         overflow = TextOverflow.Ellipsis,
-                                                        text = note.note_desc.toString(),
+                                                        text = note.note_desc,
                                                         style = TextStyle(
-                                                            color = cont_minor,
+                                                            color = MaterialTheme.colors.onSurface,
                                                             fontSize = 14.sp,
                                                             fontFamily = OpenSans,
                                                             fontStyle = FontStyle.Normal,
@@ -293,14 +318,16 @@ fun HomeScreen(navController: NavController){
                                 content ={
                                     items(itemCount) {
 
-                                        val choosedColor: Color = Brown
+                                        val choosedColor: Color = MaterialTheme.colors.onPrimary
 
                                        androidx.compose.material3.Surface(
                                             color = choosedColor,
                                             modifier = Modifier
                                                 .padding(3.dp)
-                                                .fillMaxWidth()
                                                 .sizeIn(maxHeight = 150.dp)
+                                                .border(1.dp, MaterialTheme.colors.onSurface,
+                                                    RoundedCornerShape(8.dp)
+                                                )
                                                 ,
                                            onClick = {
 
@@ -311,7 +338,6 @@ fun HomeScreen(navController: NavController){
                                                navController.navigate("note_details_page/${noteJson}")
 
                                            },
-                                            shape = RoundedCornerShape(12.dp),
                                             content = {
 
                                                 Column(
@@ -333,10 +359,10 @@ fun HomeScreen(navController: NavController){
                                                                 )
                                                                 .weight(1f)
                                                                 .wrapContentWidth(Alignment.Start),
-                                                            text = note.note_title.toString(),
+                                                            text = note.note_title,
                                                             overflow = TextOverflow.Ellipsis,
                                                             style = TextStyle(
-                                                                color = cont_normal,
+                                                                color = MaterialTheme.colors.onSurface,
                                                                 fontSize = 16.sp,
                                                                 fontFamily = OpenSans,
                                                                 fontStyle = FontStyle.Normal,
@@ -360,9 +386,9 @@ fun HomeScreen(navController: NavController){
                                                             )
                                                             .wrapContentWidth(Alignment.Start),
                                                         overflow = TextOverflow.Ellipsis,
-                                                        text = note.note_desc.toString(),
+                                                        text = note.note_desc,
                                                         style = TextStyle(
-                                                            color = cont_minor,
+                                                            color = MaterialTheme.colors.onSurface,
                                                             fontSize = 14.sp,
                                                             fontFamily = OpenSans,
                                                             fontStyle = FontStyle.Normal,
@@ -390,27 +416,32 @@ fun HomeScreen(navController: NavController){
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    backgroundColor = BottomAppBarDefaults.containerColor,
+                    backgroundColor = MaterialTheme.colors.onPrimary,
                     content = {
+                        //light-dark mode geçişleri
+                        lightColors(onSurface = LightHomeBack)
+                        darkColors(onSurface = DarkHomeBack)
+
                         IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(painter = painterResource(id = R.drawable.check), contentDescription = "check list")
+                            Icon(painter = painterResource(id = R.drawable.check), contentDescription = "check list",
+                                tint = MaterialTheme.colors.onSurface)
                         }
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.brush),
-                                contentDescription = "drawing note",
+                                contentDescription = "drawing note",tint = MaterialTheme.colors.onSurface
                             )
                         }
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.mic),
-                                contentDescription = "voice note",
+                                contentDescription = "voice note",tint = MaterialTheme.colors.onSurface
                             )
                         }
                         IconButton(onClick = { /* doSomething() */ }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.imagesmode),
-                                contentDescription = "note with images",
+                                contentDescription = "note with images",tint = MaterialTheme.colors.onSurface
                             )
                         }
                     }, cutoutShape = RoundedCornerShape(CornerSize(12.dp))
