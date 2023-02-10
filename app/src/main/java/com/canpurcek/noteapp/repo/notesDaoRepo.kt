@@ -39,30 +39,32 @@ class notesDaoRepo(var application: Application) {
         Log.e("Not arama", word)
     }
 
-    fun noteAdd(note_title: String, note: String, note_date : String) {
+    fun noteAdd(note_title: String, note: String, note_date : String,note_color : String) {
 
         val job: Job = CoroutineScope(Dispatchers.Main).launch {
 
-            val newNote = Notes(0, note_title, note, note_date)
+            val newNote = Notes(0, note_title, note, note_date,note_color)
             dB.notesDao().addNote(newNote)
         }
 
     }
 
-    fun noteUpdate(note_id: Int, note_title: String, note: String, note_date: String) {
+    fun noteUpdate(note_id: Int, note_title: String, note: String, note_date: String,note_color : String) {
 
         val job: Job = CoroutineScope(Dispatchers.Main).launch {
 
-            val updateNote = Notes(note_id, note_title, note, note_date)
+            val updateNote = Notes(note_id, note_title, note, note_date,note_color)
             dB.notesDao().updateNote(updateNote)
         }
     }
+
+
 
     fun noteDelete(note_id: Int) {
 
         val job: Job = CoroutineScope(Dispatchers.Main).launch {
 
-            val deleteNote = Notes(note_id, note_title = "", note_desc = "", note_date = "")
+            val deleteNote = Notes(note_id, note_title = "", note_desc = "", note_date = "",note_color = "")
             dB.notesDao().deleteNote(deleteNote)
         }
     }

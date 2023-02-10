@@ -2,25 +2,14 @@ package com.canpurcek.noteapp
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -31,26 +20,25 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.canpurcek.noteapp.entity.Notes
-import com.canpurcek.noteapp.ui.theme.Chakra
-import com.canpurcek.noteapp.ui.theme.DarkHomeBack
-import com.canpurcek.noteapp.ui.theme.LightHomeBack
-import com.canpurcek.noteapp.ui.theme.OpenSans
+import com.canpurcek.noteapp.ui.theme.*
+import com.canpurcek.noteapp.userinterface.ColorPicker
+import com.canpurcek.noteapp.userinterface.colourSaver
 import com.canpurcek.noteapp.viewmodel.NoteDetailScreenViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-
-
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat")
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat",
+    "UnrememberedMutableState"
+)
 @Composable
 fun NoteDetailScreen(getNote: Notes, navController: NavController) {
 
     val tFNoteTitle = remember { mutableStateOf("") }
     val tFNote = remember { mutableStateOf("") }
+
 
     LaunchedEffect(key1 = true) {
         tFNoteTitle.value = getNote.note_title.toString()
@@ -63,34 +51,125 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
     val bottomState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
 
+
     var sheetShift by remember { mutableStateOf(false) }
 
+    val colors =listOf(
+            Red,
+            Orange,
+            Yellow,
+            Green,
+            Turquoise,
+            Blue,
+            DarkBlue,
+            Purple,
+            Pink,
+            Brown,
+            Gray,
+            DarkGray,
+            LTheme,
+            DTheme
+        )
 
-        ModalBottomSheetLayout(
+
+
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+    var currentlySelected by mutableStateOf(MaterialTheme.colors.surface)
+
+
+
+
+
+    ModalBottomSheetLayout(
         sheetState = bottomState,
         content={
         Scaffold(
-            backgroundColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
+            snackbarHost = { hostState ->
+                hostState.currentSnackbarData?.let { DeleteSnack(it.message) }
+            },
+            drawerContent = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 8.dp, top = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .clickable {
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                                navController.navigate("main_page")
+                            },
+                        backgroundColor = if (isSystemInDarkTheme()) MaterialTheme.colors.surface else Color.LightGray,
+                        elevation = 0.dp,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.home),
+                                contentDescription = "Icon",
+                                modifier = Modifier,
+                                tint = MaterialTheme.colors.onSurface,
+                            )
+
+                            androidx.compose.material.Text(
+                                modifier = Modifier
+                                    .padding(start = 24.dp),
+                                text = "Ana Sayfa",
+                            )
+                        }
+                    }
+                }
+            },
+            drawerGesturesEnabled = true,
             topBar = {
                 TopAppBar(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = 0.dp,
-                    backgroundColor = MaterialTheme.colors.onPrimary
+                    backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background
                 ) {
                     IconButton(
                         onClick = {
 
+                            val data1 = getNote.note_id
+                            val data2 = tFNoteTitle.value
+                            val data3 = tFNote.value
+                            val sdf = SimpleDateFormat("EEE:HH:mm")
+                            val date = sdf.format(Date())
+                            val color = currentlySelected
+
+
+
+                            if (data2.isEmpty()) {
+
+                            } else {
+                                viewModel.noteUpdate(data1, data2, data3, date, color.toString())
+                            }
                             navController.popBackStack()
 
                         }) {
 
                         Icon(
                             painter = painterResource(id = R.drawable.back),
-                            contentDescription = "",tint = MaterialTheme.colors.onSurface
+                            contentDescription = "",
+                            tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    lightColors(onSurface = LightHomeBack)
-                    darkColors(onSurface = DarkHomeBack)
+
                 }
             },
             content = {
@@ -129,13 +208,14 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                             val data3 = tFNote.value
                             val sdf = SimpleDateFormat("EEE:HH:mm")
                             val date = sdf.format(Date())
+                            val color = currentlySelected
 
 
 
                             if (data2.isEmpty()) {
                                 return@TextField
                             } else {
-                                viewModel.noteUpdate(data1, data2, data3, date)
+                                viewModel.noteUpdate(data1, data2, data3, date, color.toString())
                             }
 
 
@@ -171,13 +251,14 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                             val data3 = tFNote.value
                             val sdf = SimpleDateFormat("EEE:HH:mm")
                             val date = sdf.format(Date())
+                            val color = Color.White
 
 
 
                             if (data3.isEmpty()) {
                                 return@TextField
                             } else {
-                                viewModel.noteUpdate(data1, data2, data3, date)
+                                viewModel.noteUpdate(data1, data2, data3, date, color.toString())
                             }
                         },
                         shape = RoundedCornerShape(8.dp),
@@ -192,147 +273,96 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    containerColor = MaterialTheme.colors.onPrimary,
-                    content = {
-                        darkColors(onSurface = LightHomeBack)
-                        lightColors(onSurface = DarkHomeBack)
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+                    contentColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
+                ) {
 
-                        IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.multi_add),
-                                contentDescription = "multi add", tint = MaterialTheme.colors.onSurface
-                            )
-                        }
-                        IconButton(onClick = {
+                    IconButton(onClick = { /* doSomething() */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.multi_add),
+                            contentDescription = "multi add", tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurface
+                        )
+                    }
 
-                            sheetShift = true
+                    ColorPicker(
+                        colors = colors,
+                        onColorSelected = {
 
-                            scope.launch { bottomState.show() }
+                        currentlySelected=it
 
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.palette),
-                                contentDescription = "note color palette", tint = MaterialTheme.colors.onSurface
-                            )
-                        }
-
-                        val date = getNote.note_date
-
-                        Text(text = "Düzenlenme ${date.toString()}",
-                            style = TextStyle(MaterialTheme.colors.onSurface))
+                    }, modifier = Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground))
 
 
-                        IconButton(modifier = Modifier.padding(end = 5.dp),
-                            onClick = {
+                    val date = getNote.note_date
+
+                    Text(
+                        text = "Düzenlenme ${date.toString()}",
+                        style = TextStyle(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
+                    )
+
+
+                    IconButton(modifier = Modifier.padding(end = 5.dp),
+                        onClick = {
 
                             sheetShift = false
 
                             scope.launch { bottomState.show() }
 
                         }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.menu),
-                                contentDescription = "options menu", tint = MaterialTheme.colors.onSurface
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.menu),
+                            contentDescription = "options menu",
+                            tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                        )
                     }
-                )
-            }
+                }
+            },
+
         )
     },
         sheetContent = {
 
-            if (sheetShift) {
-
-
-
-            } else {
-
-                Column(modifier = Modifier
-                    .padding(start = 10.dp, end = 10.dp)
-                    .fillMaxWidth()
-                    .height(200.dp),
+                Column(
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp)
+                        .fillMaxWidth()
+                        .height(200.dp),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
 
-                    darkColors(onSurface = LightHomeBack)
-                    lightColors(onSurface = DarkHomeBack)
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable{
-                                val id = getNote.note_id
+                            .clickable(
+                                onClick = {
 
-                                viewModel.noteDelete(id)
+                                    scope.launch {
+                                        scaffoldState.snackbarHostState.showSnackbar("Not silindi!")
+                                    }
 
-                                navController.navigate("main_page")
-                        },
+
+
+                                    val id = getNote.note_id
+
+                                    viewModel.noteDelete(id)
+
+                                    navController.navigate("main_page")
+                                }
+                            ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.delete),
-                                contentDescription = "delete"
-                            )
+                        Icon(
+                            painter = painterResource(id = R.drawable.delete),
+                            contentDescription = "delete"
+                        )
 
                         Spacer(
                             modifier = Modifier
                                 .width(5.dp)
                         )
 
-                        Text(text = "Sil",style = TextStyle(MaterialTheme.colors.onSurface))
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(5.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable{
-
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                            Icon(
-                                painter = painterResource(id = R.drawable.copy),
-                                contentDescription = "copy"
-                            )
-                        Spacer(
-                            modifier = Modifier
-                                .width(5.dp)
-                        )
-
-                        Text(text = "Kopya oluştur",style = TextStyle(MaterialTheme.colors.onSurface))
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(5.dp)
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable{
-
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                            Icon(
-                                painter = painterResource(id = R.drawable.share),
-                                contentDescription = "share"
-                            )
-                        Spacer(
-                            modifier = Modifier
-                                .width(5.dp)
-                        )
-
-                        Text(text = "Gönder",style = TextStyle(MaterialTheme.colors.onSurface))
+                        Text(text = "Sil", style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
@@ -349,16 +379,19 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                            Icon(
-                                painter = painterResource(id = R.drawable.add_alt),
-                                contentDescription = "add_alt"
-                            )
+                        Icon(
+                            painter = painterResource(id = R.drawable.copy),
+                            contentDescription = "copy"
+                        )
                         Spacer(
                             modifier = Modifier
                                 .width(5.dp)
                         )
 
-                        Text(text = "Ortak çalışan",style = TextStyle(MaterialTheme.colors.onSurface))
+                        Text(
+                            text = "Kopya oluştur",
+                            style = TextStyle(MaterialTheme.colors.onSurface)
+                        )
                     }
                     Spacer(
                         modifier = Modifier
@@ -375,33 +408,116 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                            Icon(
-                                painter = painterResource(id = R.drawable.label),
-                                contentDescription = "labels"
-                            )
+                        Icon(
+                            painter = painterResource(id = R.drawable.share),
+                            contentDescription = "share"
+                        )
                         Spacer(
                             modifier = Modifier
                                 .width(5.dp)
                         )
 
-                        Text(text = "Etiketler",style = TextStyle(MaterialTheme.colors.onSurface))
+                        Text(text = "Gönder", style = TextStyle(MaterialTheme.colors.onSurface))
                     }
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(5.dp)
                     )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.add_alt),
+                            contentDescription = "add_alt"
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(
+                            text = "Ortak çalışan",
+                            style = TextStyle(MaterialTheme.colors.onSurface)
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(5.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.label),
+                            contentDescription = "labels"
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .width(5.dp)
+                        )
+
+                        Text(text = "Etiketler", style = TextStyle(MaterialTheme.colors.onSurface))
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(5.dp)
+                    )
+                    DeleteSnack()
                 }
             }
-        })
+        )
 
     val backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
+
+        val data1 = getNote.note_id
+        val data2 = tFNoteTitle.value
+        val data3 = tFNote.value
+        val sdf = SimpleDateFormat("EEE:HH:mm")
+        val date = sdf.format(Date())
+        val color = currentlySelected
+
+
+
+        if (data2.isEmpty()) {
+
+        } else {
+            viewModel.noteUpdate(data1, data2, data3, date, color.toString())
+        }
+
+        colourSaver()
         navController.popBackStack()
+
 
     }
 }
 
+
+@Composable
+private fun DeleteSnack(
+    text: String = "Not silindi!"
+) {
+    Snackbar(
+        content = { Text(text = text, color = Color.White) }
+    )
+}
 
 
 

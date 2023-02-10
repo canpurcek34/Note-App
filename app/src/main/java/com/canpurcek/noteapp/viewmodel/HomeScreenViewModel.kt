@@ -30,9 +30,9 @@ class HomeScreenViewModel(application: Application): AndroidViewModel(applicatio
         nRepo.noteDelete(note_id)
     }
 
-    fun noteUpdate(note_id: Int, note_title : String, note: String,note_date : String){
+    fun noteUpdate(note_id: Int, note_title : String, note: String,note_date : String,note_color : String){
 
-        nRepo.noteUpdate(note_id, note_title, note,note_date)
+        nRepo.noteUpdate(note_id, note_title, note,note_date,note_color)
     }
 
 }

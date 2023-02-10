@@ -10,9 +10,9 @@ class AddNoteScreenViewModel(application: Application): AndroidViewModel(applica
 
     var nRepo = notesDaoRepo(application)
 
-    fun noteAdd(note_title : String, note: String, note_date : String){
+    fun noteAdd(note_title : String, note: String, note_date : String,note_color : String){
 
-        nRepo.noteAdd(note_title, note, note_date)
+        nRepo.noteAdd(note_title, note, note_date, note_color)
     }
 
 }

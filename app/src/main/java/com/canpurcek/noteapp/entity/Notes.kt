@@ -1,5 +1,6 @@
 package com.canpurcek.noteapp.entity
 
+import android.graphics.Color
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -16,9 +17,11 @@ data class Notes(
     @ColumnInfo("note_title") var note_title: String,
     @ColumnInfo("note_desc") var note_desc: String,
     @ColumnInfo("note_date") var note_date: String,
+    @ColumnInfo("note_color") var note_color: String,
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
+        parcel.readString().toString(),
         parcel.readString().toString(),
         parcel.readString().toString(),
         parcel.readString().toString(),
@@ -29,6 +32,7 @@ data class Notes(
         parcel.writeString(note_title)
         parcel.writeString(note_desc)
         parcel.writeString(note_date)
+        parcel.writeString(note_color.toString())
     }
 
     override fun describeContents(): Int {

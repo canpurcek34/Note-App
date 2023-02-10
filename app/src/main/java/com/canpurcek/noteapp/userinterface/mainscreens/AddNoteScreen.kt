@@ -1,16 +1,15 @@
-package com.canpurcek.noteapp
+package com.canpurcek.noteapp.userinterface.mainscreens
 
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -21,15 +20,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.canpurcek.noteapp.entity.Notes
-import com.canpurcek.noteapp.ui.theme.Chakra
-import com.canpurcek.noteapp.ui.theme.DarkHomeBack
-import com.canpurcek.noteapp.ui.theme.LightHomeBack
+import com.canpurcek.noteapp.R
+import com.canpurcek.noteapp.ui.theme.*
 import com.canpurcek.noteapp.viewmodel.AddNoteScreenViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat",
+    "UnrememberedMutableState"
+)
 @Composable
 fun AddNoteScreen(NavController: NavHostController) {
 
@@ -43,12 +43,64 @@ fun AddNoteScreen(NavController: NavHostController) {
     val navController = NavController
 
 
+    var currentlySelected by  mutableStateOf(MaterialTheme.colors.surface)
+
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
-        backgroundColor = MaterialTheme.colors.onPrimary,
+        backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
+        drawerContent = {
+            Column(
+                modifier = Modifier
+                    .width(150.dp)
+                    .padding(start = 8.dp, top = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                        .clickable {
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
+                            navController.navigate("main_page")
+                        },
+                    backgroundColor = if (isSystemInDarkTheme()) MaterialTheme.colors.surface else Color.LightGray,
+                    elevation = 0.dp,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.home),
+                            contentDescription = "Icon",
+                            modifier = Modifier,
+                            tint = MaterialTheme.colors.surface,
+                        )
+
+                        androidx.compose.material.Text(
+                            modifier = Modifier
+                                .padding(start = 24.dp),
+                            text = "Ana Sayfa",
+                        )
+                    }
+                }
+            }
+        },
+        drawerGesturesEnabled = true,
         topBar = {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = MaterialTheme.colors.onPrimary
+                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background
             ) {
                 IconButton(
 
@@ -58,15 +110,15 @@ fun AddNoteScreen(NavController: NavHostController) {
                         val desc = tFNote.value
                         val sdf = SimpleDateFormat("EEE:HH:mm")
                         val date = sdf.format(Date())
+                        val color = currentlySelected
 
                         if (title.isEmpty()) {
-                            return@IconButton
+                            NavController.navigate("main_page")
                         } else if (desc.isEmpty()) {
-                            return@IconButton
+                            NavController.navigate("main_page")
                         } else {
-                            viewModel.noteAdd(title, desc, date)
+                            viewModel.noteAdd(title, desc, date, color.toString())
 
-                            Log.e("KAYIT", "${title}-${desc}")
                         }
 
 
@@ -77,7 +129,7 @@ fun AddNoteScreen(NavController: NavHostController) {
 
                     Icon(
                         painter = painterResource(id = R.drawable.back),
-                        contentDescription = "",tint = MaterialTheme.colors.onSurface
+                        contentDescription = "",tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                     )
                 }
 
@@ -85,8 +137,8 @@ fun AddNoteScreen(NavController: NavHostController) {
 
         },
         content = {
-            lightColors(onSurface = MaterialTheme.colors.onPrimary)
-            darkColors(onSurface = MaterialTheme.colors.onPrimary)
+            lightColors(onSurface = MaterialTheme.colors.surface)
+            darkColors(onSurface = MaterialTheme.colors.surface)
 
             Column(modifier = Modifier.fillMaxSize()) {
                 val lightBlue = Color(0xffd8e6ff)
@@ -188,10 +240,11 @@ fun AddNoteScreen(NavController: NavHostController) {
         val desc = tFNote.value
         val sdf = SimpleDateFormat("EEE:HH:mm")
         val date = sdf.format(Date())
+        val color = currentlySelected
 
         if ((title + desc).isNotEmpty()) {
 
-            viewModel.noteAdd(title, desc, date)
+            viewModel.noteAdd(title, desc, date, color.toString())
 
             Log.e("KAYIT", "${title}-${desc}")
         }
