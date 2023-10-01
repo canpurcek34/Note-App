@@ -1,4 +1,4 @@
-package com.canpurcek.noteapp.userinterface.mainscreens
+package com.canpurcek.noteapp.userinterface.main
 
 
 import android.annotation.SuppressLint
@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.FabPosition
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -48,14 +46,11 @@ import kotlinx.coroutines.*
 @Composable
 fun HomeScreen(navController: NavController) {
 
-
     val context = LocalContext.current
 
     val viewModel: HomeScreenViewModel = viewModel(
         factory = HomeScreenViewModelFactory(
             context.applicationContext as Application))
-
-    LaunchedEffect(key1 = true) {viewModel.loadNotes() }
 
     val isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
@@ -65,6 +60,9 @@ fun HomeScreen(navController: NavController) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(key1 = true) {
+        viewModel.loadNotes()
+    }
 
     SwipeRefresh(
         state = swipeRefreshState,
@@ -88,13 +86,9 @@ fun HomeScreen(navController: NavController) {
                         }
                     }, navController
                 )
-
-
             },
             drawerContent = {
-                            DrawerHeader(
-                                modifier = Modifier,
-                                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.secondary)
+                            DrawerHeader()
                             DrawerBody(
                                 items = listOf(
                                     MenuItem(
@@ -110,8 +104,6 @@ fun HomeScreen(navController: NavController) {
                                         contentDescription = "Settings screen navigation",
                                         icon = Icons.Default.Settings
                                     ),
-                                    
-
 
                                 ),
                                 modifier = Modifier,
@@ -123,12 +115,8 @@ fun HomeScreen(navController: NavController) {
                                     }
                                 }
                             )
-
-
-
             },
             content = {
-
 
             },
             bottomBar = {
@@ -188,11 +176,8 @@ fun HomeScreen(navController: NavController) {
                 }
             }
         )
-
-
     }
 }
-
 
 @Composable
 fun CustomViewPullRefreshView(

@@ -1,4 +1,4 @@
-package com.canpurcek.noteapp.userinterface.mainscreens
+package com.canpurcek.noteapp.userinterface.main
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -14,14 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.canpurcek.noteapp.R
-import com.canpurcek.noteapp.ui.theme.*
 import com.canpurcek.noteapp.viewmodel.AddNoteScreenViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -34,16 +30,15 @@ import java.util.*
 fun AddNoteScreen(NavController: NavHostController) {
 
 
-    val tFNoteTitle = remember { mutableStateOf<String>("") }
-    val tFNote = remember { mutableStateOf<String>("") }
+    val id = remember{ mutableStateOf(0) }
+    val title = remember { mutableStateOf("Başlık") }
+    val note = remember { mutableStateOf("Note") }
+    val date = remember { mutableStateOf("Haziran") }
 
 
     val viewModel: AddNoteScreenViewModel = viewModel()
 
-    val navController = NavController
 
-
-    var currentlySelected by  mutableStateOf(MaterialTheme.colors.surface)
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -68,7 +63,7 @@ fun AddNoteScreen(NavController: NavHostController) {
                             coroutineScope.launch {
                                 scaffoldState.drawerState.close()
                             }
-                            navController.navigate("main_page")
+                            NavController.navigate("main_page")
                         },
                     backgroundColor = if (isSystemInDarkTheme()) MaterialTheme.colors.surface else Color.LightGray,
                     elevation = 0.dp,
@@ -87,7 +82,7 @@ fun AddNoteScreen(NavController: NavHostController) {
                             tint = MaterialTheme.colors.surface,
                         )
 
-                        androidx.compose.material.Text(
+                        Text(
                             modifier = Modifier
                                 .padding(start = 24.dp),
                             text = "Ana Sayfa",
@@ -106,22 +101,7 @@ fun AddNoteScreen(NavController: NavHostController) {
 
                     onClick = {
 
-                        val title = tFNoteTitle.value
-                        val desc = tFNote.value
-                        val sdf = SimpleDateFormat("EEE:HH:mm")
-                        val date = sdf.format(Date())
-                        val color = currentlySelected
-
-                        if (title.isEmpty()) {
-                            NavController.navigate("main_page")
-                        } else if (desc.isEmpty()) {
-                            NavController.navigate("main_page")
-                        } else {
-                            viewModel.noteAdd(title, desc, date, color.toString())
-
-                        }
-
-
+                        viewModel.insert(title.toString(),note.toString(),date.toString())
 
                         NavController.navigate("main_page")
 
@@ -137,58 +117,56 @@ fun AddNoteScreen(NavController: NavHostController) {
 
         },
         content = {
-            lightColors(onSurface = MaterialTheme.colors.surface)
-            darkColors(onSurface = MaterialTheme.colors.surface)
 
             Column(modifier = Modifier.fillMaxSize()) {
-                val lightBlue = Color(0xffd8e6ff)
-                val blue = Color(0xff76a9ff)
+
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = tFNoteTitle.value,
-                    label = { Text(text = "Başlık",style = TextStyle(MaterialTheme.colors.onSurface)) },
-                    textStyle = TextStyle(
-                        fontSize = 18.sp,
-                        fontFamily = Chakra,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Medium
-                    ),
+                    value = title.value,
+                    label = {
+                        androidx.compose.material3.Text(
+                            text = "Başlık",
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                        )
+                    },
+                    textStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        cursorColor = MaterialTheme.colors.onSurface,
-                        disabledLabelColor = lightBlue,
+                        cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        textColor = MaterialTheme.colors.onSurface
+                        textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                     ),
                     onValueChange = {
 
-                        tFNoteTitle.value = it
+                        title.value = it
 
                     },
                     shape = RoundedCornerShape(8.dp),
                 )
                 Spacer(modifier = Modifier.size(2.dp))
+
                 TextField(
-                    modifier = Modifier,
-                    value = tFNote.value,
-                    label = { Text(text = "Not", style = TextStyle(MaterialTheme.colors.onSurface)) },
-                    textStyle = TextStyle(
-                        fontSize = 14.sp,
-                        fontFamily = Chakra,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.Normal
-                    ),
+                    modifier = Modifier.fillMaxSize(),
+                    value = note.value,
+                    label = {
+                        androidx.compose.material3.Text(
+                            text = "Not",
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                        )
+                    },
+                    textStyle = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
-                        cursorColor = MaterialTheme.colors.onSurface,
-                        disabledLabelColor = lightBlue,
+                        cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        textColor = MaterialTheme.colors.onSurface
+                        textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                     ),
                     onValueChange = {
-                        tFNote.value = it
+                        note.value = it
                     },
                     shape = RoundedCornerShape(8.dp),
 
@@ -202,28 +180,27 @@ fun AddNoteScreen(NavController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                backgroundColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
                 content = {
-                    darkColors(onSurface = Color.LightGray)
-                    lightColors(onSurface = Color.White)
+
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.multi_add),
-                            contentDescription = "multi add",tint = MaterialTheme.colors.onSurface
+                            contentDescription = "multi add",tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                         )
                     }
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             painter = painterResource(id = R.drawable.palette),
-                            contentDescription = "note color palette",tint = MaterialTheme.colors.onSurface
+                            contentDescription = "note color palette",tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                         )
                     }
                     val sdf = SimpleDateFormat("EEE:HH:mm")
                     val date = sdf.format(Date())
 
                     Text(modifier = Modifier,
-                        text = "Düzenlenme ${date}",
-                        style = TextStyle(MaterialTheme.colors.onSurface))
+                        text = "Düzenlenme $date",
+                        style = TextStyle(androidx.compose.material3.MaterialTheme.colorScheme.onBackground))
 
                 }
 
@@ -236,22 +213,10 @@ fun AddNoteScreen(NavController: NavHostController) {
     val backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
 
-        val title = tFNoteTitle.value
-        val desc = tFNote.value
-        val sdf = SimpleDateFormat("EEE:HH:mm")
-        val date = sdf.format(Date())
-        val color = currentlySelected
-
-        if ((title + desc).isNotEmpty()) {
-
-            viewModel.noteAdd(title, desc, date, color.toString())
-
-            Log.e("KAYIT", "${title}-${desc}")
-        }
-        NavController.popBackStack()
-
-
+        viewModel.insert(title.toString(),note.toString(),date.toString())
     }
+
+
 }
 
 

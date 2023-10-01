@@ -133,7 +133,7 @@ fun AppBar(
     }
     Navigation(screen, Modifier) { currentScreen ->
         if (currentScreen == "list_view") {
-            GridView(modifier = Modifier, navController = navController)
+            GridView(navController = navController)
         } else {
             ListView(modifier = Modifier, navController =navController )
         }

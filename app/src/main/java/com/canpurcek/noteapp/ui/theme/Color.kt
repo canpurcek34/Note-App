@@ -1,5 +1,3 @@
-package com.canpurcek.noteapp.ui.theme
-
 import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
 

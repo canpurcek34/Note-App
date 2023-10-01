@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "8914345940",
+    "project_id": "keep-note-clone-c984d",
+    "storage_bucket": "keep-note-clone-c984d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:8914345940:android:d0089b67eb28aa1eac0041",
+        "android_client_info": {
+          "package_name": "com.canpurcek.noteapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "8914345940-grbum049lgjtpt1hn1eu61gldifn42hj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD97Alk6UuxRo2f9tmp0ZBMFQJKvqMsr_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "8914345940-grbum049lgjtpt1hn1eu61gldifn42hj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

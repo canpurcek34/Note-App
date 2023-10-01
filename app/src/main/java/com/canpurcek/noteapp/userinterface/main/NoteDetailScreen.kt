@@ -1,27 +1,26 @@
-package com.canpurcek.noteapp
+package com.canpurcek.noteapp.userinterface.main
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.canpurcek.noteapp.entity.Notes
+import com.canpurcek.noteapp.R
+import com.canpurcek.noteapp.retrofit.JSON.Notebook
 import com.canpurcek.noteapp.ui.theme.*
-import com.canpurcek.noteapp.userinterface.ColorPicker
 import com.canpurcek.noteapp.userinterface.colourSaver
 import com.canpurcek.noteapp.viewmodel.NoteDetailScreenViewModel
 import kotlinx.coroutines.launch
@@ -29,58 +28,41 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SimpleDateFormat",
     "UnrememberedMutableState"
 )
 @Composable
-fun NoteDetailScreen(getNote: Notes, navController: NavController) {
-
-    val tFNoteTitle = remember { mutableStateOf("") }
-    val tFNote = remember { mutableStateOf("") }
-
-
-    LaunchedEffect(key1 = true) {
-        tFNoteTitle.value = getNote.note_title.toString()
-        tFNote.value = getNote.note_desc.toString()
-    }
+fun NoteDetailScreen(obj: Notebook, navController: NavController) {
 
     val viewModel: NoteDetailScreenViewModel = viewModel()
+    val notes = viewModel.notebook.observeAsState(listOf())
 
+    val localFocusManager = LocalFocusManager.current
 
     val bottomState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
 
+    val id = remember{ mutableStateOf(0) }
+    val title = remember { mutableStateOf("") }
+    val note = remember { mutableStateOf("") }
+    val date = remember { mutableStateOf("") }
+
+    LaunchedEffect(key1 =true){
+         id.value = obj.id
+         title.value= obj.title
+         note.value = obj.note
+         date.value = obj.date
+    }
+
 
     var sheetShift by remember { mutableStateOf(false) }
-
-    val colors =listOf(
-            Red,
-            Orange,
-            Yellow,
-            Green,
-            Turquoise,
-            Blue,
-            DarkBlue,
-            Purple,
-            Pink,
-            Brown,
-            Gray,
-            DarkGray,
-            LTheme,
-            DTheme
-        )
-
 
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
-    var currentlySelected by mutableStateOf(MaterialTheme.colors.surface)
-
-
-
-
+    val currentlySelected by mutableStateOf(MaterialTheme.colors.surface)
 
     ModalBottomSheetLayout(
         sheetState = bottomState,
@@ -97,6 +79,7 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                         .padding(start = 8.dp, top = 32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Card(
@@ -145,21 +128,14 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     IconButton(
                         onClick = {
 
-                            val data1 = getNote.note_id
-                            val data2 = tFNoteTitle.value
-                            val data3 = tFNote.value
-                            val sdf = SimpleDateFormat("EEE:HH:mm")
-                            val date = sdf.format(Date())
-                            val color = currentlySelected
+                            val newTitle = title.value
+                            val newNote = note.value
+                            val newDate = date.value
+
+                            viewModel.update(obj.id,newTitle,newNote,newDate)
 
 
-
-                            if (data2.isEmpty()) {
-
-                            } else {
-                                viewModel.noteUpdate(data1, data2, data3, date, color.toString())
-                            }
-                            navController.popBackStack()
+                            navController.navigate("main_page")
 
                         }) {
 
@@ -173,93 +149,60 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                 }
             },
             content = {
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Transparent)
                         .padding(bottom = 35.dp)
                 ) {
-                    val lightBlue = Color(0xffd8e6ff)
-                    val blue = Color(0xff76a9ff)
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = tFNoteTitle.value,
-                        label = { Text(text = "Başlık",style = TextStyle(MaterialTheme.colors.onSurface)) },
-                        textStyle = TextStyle(
-                            fontSize = 16.sp,
-                            fontFamily = OpenSans,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.W500
-                        ),
-                        colors = TextFieldDefaults.textFieldColors(
+                        value = title.value,
+                        label = {
+                            Text(
+                                text = "Başlık",
+                                style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                            ) },
+                        textStyle = androidx.compose.material3.MaterialTheme.typography.titleSmall,
+                        colors =
+                        TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
                             cursorColor = MaterialTheme.colors.onSurface,
-                            disabledLabelColor = lightBlue,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            textColor = MaterialTheme.colors.onSurface
+                            textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                         ),
-                        onValueChange = {
-
-                            tFNoteTitle.value = it
-
-                            val data1 = getNote.note_id
-                            val data2 = tFNoteTitle.value
-                            val data3 = tFNote.value
-                            val sdf = SimpleDateFormat("EEE:HH:mm")
-                            val date = sdf.format(Date())
-                            val color = currentlySelected
-
-
-
-                            if (data2.isEmpty()) {
-                                return@TextField
-                            } else {
-                                viewModel.noteUpdate(data1, data2, data3, date, color.toString())
-                            }
-
-
+                        onValueChange ={
+                                       title.value=it
                         },
                         shape = RoundedCornerShape(8.dp),
                         singleLine = true,
-
                         )
+
                     Spacer(modifier = Modifier.size(2.dp))
+
                     TextField(
                         modifier = Modifier.padding(bottom = 10.dp),
-                        value = tFNote.value,
-                        label = { Text(text = "Not",style = TextStyle(MaterialTheme.colors.onSurface)) },
-                        textStyle = TextStyle(
-                            fontSize = 14.sp,
-                            fontFamily = OpenSans,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.W400
-                        ),
-                        colors = TextFieldDefaults.textFieldColors(
+                        value = note.value,
+                        label = {
+                            Text(
+                            text = "Not",
+                            style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                            ) },
+                        textStyle = androidx.compose.material3.MaterialTheme.typography.titleSmall,
+                        colors =
+                        TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
                             cursorColor = MaterialTheme.colors.onSurface,
-                            disabledLabelColor = lightBlue,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            textColor = MaterialTheme.colors.onSurface
+                            textColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                         ),
                         onValueChange = {
-                            tFNote.value = it
-
-                            val data1 = getNote.note_id
-                            val data2 = tFNoteTitle.value
-                            val data3 = tFNote.value
-                            val sdf = SimpleDateFormat("EEE:HH:mm")
-                            val date = sdf.format(Date())
-                            val color = Color.White
-
-
-
-                            if (data3.isEmpty()) {
-                                return@TextField
-                            } else {
-                                viewModel.noteUpdate(data1, data2, data3, date, color.toString())
-                            }
+                            note.value=it
                         },
                         shape = RoundedCornerShape(8.dp),
                         singleLine = false,
@@ -273,8 +216,7 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
-                    contentColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background
                 ) {
 
                     IconButton(onClick = { /* doSomething() */ }) {
@@ -284,19 +226,10 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                         )
                     }
 
-                    ColorPicker(
-                        colors = colors,
-                        onColorSelected = {
-
-                        currentlySelected=it
-
-                    }, modifier = Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground))
-
-
-                    val date = getNote.note_date
+                    val dateEdit = date
 
                     Text(
-                        text = "Düzenlenme ${date.toString()}",
+                        text = "Düzenlenme $dateEdit",
                         style = TextStyle(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
                     )
 
@@ -337,22 +270,13 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                             .clickable(
                                 onClick = {
 
-                                    scope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar("Not silindi!")
-                                    }
-
-
-
-                                    val id = getNote.note_id
-
-                                    viewModel.noteDelete(id)
-
                                     navController.navigate("main_page")
                                 }
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
+                            modifier= Modifier,
                             painter = painterResource(id = R.drawable.delete),
                             contentDescription = "delete"
                         )
@@ -458,7 +382,12 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-
+                                scope.launch {
+                                    scaffoldState.snackbarHostState.showSnackbar(
+                                        message = "Not silindi!",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -479,7 +408,7 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
                             .fillMaxWidth()
                             .height(5.dp)
                     )
-                    DeleteSnack()
+
                 }
             }
         )
@@ -487,20 +416,9 @@ fun NoteDetailScreen(getNote: Notes, navController: NavController) {
     val backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
 
-        val data1 = getNote.note_id
-        val data2 = tFNoteTitle.value
-        val data3 = tFNote.value
-        val sdf = SimpleDateFormat("EEE:HH:mm")
-        val date = sdf.format(Date())
-        val color = currentlySelected
 
-
-
-        if (data2.isEmpty()) {
-
-        } else {
-            viewModel.noteUpdate(data1, data2, data3, date, color.toString())
-        }
+        viewModel.update(obj.id,obj.title,obj.note,obj.date)
+        navController.navigate("main_page")
 
         colourSaver()
         navController.popBackStack()
