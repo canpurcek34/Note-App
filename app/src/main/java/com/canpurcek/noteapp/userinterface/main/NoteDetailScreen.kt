@@ -38,21 +38,19 @@ fun NoteDetailScreen(obj: Notebook, navController: NavController) {
     val viewModel: NoteDetailScreenViewModel = viewModel()
     val notes = viewModel.notebook.observeAsState(listOf())
 
-    val localFocusManager = LocalFocusManager.current
-
     val bottomState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
 
-    val id = remember{ mutableStateOf(0) }
     val title = remember { mutableStateOf("") }
     val note = remember { mutableStateOf("") }
-    val date = remember { mutableStateOf("") }
+    val sdf = SimpleDateFormat("EEE:HH:mm")
+    val date = Date()
+    val editDate= remember { mutableStateOf(sdf.format(date)) }
 
     LaunchedEffect(key1 =true){
-         id.value = obj.id
-         title.value= obj.title
-         note.value = obj.note
-         date.value = obj.date
+        title.value= obj.title
+        note.value = obj.note
+        editDate.value = obj.date
     }
 
 
@@ -61,8 +59,6 @@ fun NoteDetailScreen(obj: Notebook, navController: NavController) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-
-    val currentlySelected by mutableStateOf(MaterialTheme.colors.surface)
 
     ModalBottomSheetLayout(
         sheetState = bottomState,
@@ -128,11 +124,12 @@ fun NoteDetailScreen(obj: Notebook, navController: NavController) {
                     IconButton(
                         onClick = {
 
+                            val newID = obj.id
                             val newTitle = title.value
                             val newNote = note.value
-                            val newDate = date.value
+                            val newDate = editDate.value
 
-                            viewModel.update(obj.id,newTitle,newNote,newDate)
+                            viewModel.update(newID,newTitle,newNote,newDate)
 
 
                             navController.navigate("main_page")
@@ -226,10 +223,10 @@ fun NoteDetailScreen(obj: Notebook, navController: NavController) {
                         )
                     }
 
-                    val dateEdit = date
+                    val newDate = editDate.value
 
                     Text(
-                        text = "Düzenlenme $dateEdit",
+                        text = "Düzenlenme $newDate",
                         style = TextStyle(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
                     )
 
@@ -417,7 +414,13 @@ fun NoteDetailScreen(obj: Notebook, navController: NavController) {
     BackHandler(backHandlingEnabled) {
 
 
-        viewModel.update(obj.id,obj.title,obj.note,obj.date)
+        val newID = obj.id
+        val newTitle = title.value
+        val newNote = note.value
+        val newDate = editDate.value
+
+        viewModel.update(newID,newTitle,newNote,newDate)
+
         navController.navigate("main_page")
 
         colourSaver()

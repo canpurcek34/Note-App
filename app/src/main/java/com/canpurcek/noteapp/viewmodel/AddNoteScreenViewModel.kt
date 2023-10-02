@@ -22,6 +22,8 @@ class AddNoteScreenViewModel(application: Application): AndroidViewModel(applica
         notesDaoInterface = APIUtils.getNotebookDaoInterface()
         notebook = MutableLiveData()
     }
+
+
     fun insert(title:String,note:String, date: String){
         notesDaoInterface.insert(title,note,date).enqueue(object : Callback<CRUDResponse> {
             override fun onResponse(call: Call<CRUDResponse>, response: Response<CRUDResponse>) {
@@ -33,5 +35,4 @@ class AddNoteScreenViewModel(application: Application): AndroidViewModel(applica
             }
         })
     }
-
 }

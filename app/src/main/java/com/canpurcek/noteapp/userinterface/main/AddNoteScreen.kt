@@ -1,6 +1,7 @@
 package com.canpurcek.noteapp.userinterface.main
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -31,14 +32,13 @@ fun AddNoteScreen(NavController: NavHostController) {
 
 
     val id = remember{ mutableStateOf(0) }
-    val title = remember { mutableStateOf("Başlık") }
-    val note = remember { mutableStateOf("Note") }
-    val date = remember { mutableStateOf("Haziran") }
-
+    val title = remember { mutableStateOf("") }
+    val note = remember { mutableStateOf("") }
+    val sdf = SimpleDateFormat("EEE:HH:mm")
+    val date = Date()
+    val editDate= remember { mutableStateOf(sdf.format(date)) }
 
     val viewModel: AddNoteScreenViewModel = viewModel()
-
-
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -101,7 +101,12 @@ fun AddNoteScreen(NavController: NavHostController) {
 
                     onClick = {
 
-                        viewModel.insert(title.toString(),note.toString(),date.toString())
+
+                        val newTitle = title.value
+                        val newNote = note.value
+                        val newDate = editDate.value
+
+                        viewModel.insert(newTitle,newNote,newDate)
 
                         NavController.navigate("main_page")
 
@@ -195,8 +200,6 @@ fun AddNoteScreen(NavController: NavHostController) {
                             contentDescription = "note color palette",tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    val sdf = SimpleDateFormat("EEE:HH:mm")
-                    val date = sdf.format(Date())
 
                     Text(modifier = Modifier,
                         text = "Düzenlenme $date",
@@ -213,9 +216,12 @@ fun AddNoteScreen(NavController: NavHostController) {
     val backHandlingEnabled by remember { mutableStateOf(true) }
     BackHandler(backHandlingEnabled) {
 
-        viewModel.insert(title.toString(),note.toString(),date.toString())
-    }
+        val newTitle = title.value
+        val newNote = note.value
+        val newDate = editDate.value
 
+        viewModel.insert(newTitle,newNote,newDate)
+    }
 
 }
 

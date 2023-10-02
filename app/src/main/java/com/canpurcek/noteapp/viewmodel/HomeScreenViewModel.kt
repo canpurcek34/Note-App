@@ -49,16 +49,4 @@ class HomeScreenViewModel(application: Application): AndroidViewModel(applicatio
             }
         })
     }
-
-    fun update(id:Int,title:String,note:String, date: String){
-        notesDaoInterface.update(id,title,note, date).enqueue(object : Callback<CRUDResponse>{
-            override fun onResponse(call: Call<CRUDResponse>, response: Response<CRUDResponse>) {
-                Log.e("veritabani","update basarili")
-            }
-            override fun onFailure(call: Call<CRUDResponse>?, t: Throwable?) {
-                Log.e("veritabani","update basarisiz")
-
-            }
-        })
-    }
 }

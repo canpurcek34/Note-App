@@ -23,31 +23,6 @@ class NoteDetailScreenViewModel(application : Application): AndroidViewModel(app
         notebook = MutableLiveData()
     }
 
-    fun loadNotes(){
-
-        notesDaoInterface.getNote().enqueue(object : Callback<NotebookResponse> {
-            override fun onResponse(
-                call: Call<NotebookResponse>,
-                response: Response<NotebookResponse>
-            ) {
-                val notesList = response.body()!!.notebook
-                notebook.value = notesList
-
-                for (k in notesList){
-                    Log.e("*****retrofit*****","*****retrofit*****")
-                    Log.e("Notebook ID",k.id.toString())
-                    Log.e("Note Title",k.title)
-                    Log.e("Note",k.note)
-                    Log.e("Note Date",k.date)
-                }
-            }
-
-            override fun onFailure(call: Call<NotebookResponse>, t: Throwable) {
-                TODO("Not yet implemented")
-            }
-        })
-    }
-
     fun update(id:Int,title:String,note:String, date: String){
         notesDaoInterface.update(id,title,note, date).enqueue(object : Callback<CRUDResponse>{
             override fun onResponse(call: Call<CRUDResponse>, response: Response<CRUDResponse>) {
